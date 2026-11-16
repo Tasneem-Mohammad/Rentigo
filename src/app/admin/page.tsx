@@ -1,0 +1,2 @@
+import { PlaceholderPage } from "@/components/shared/placeholder-page";
+export default function AdminPage() { return <PlaceholderPage eyebrow="Operator layout · public preview" title="A thoughtful view of the neighbourhood." description="Users, listings, bookings, and private issue reports will be managed here after operator access checks are implemented. Moderation actions and real data are absent."/>; }
