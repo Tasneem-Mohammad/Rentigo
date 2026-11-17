@@ -1,6 +1,7 @@
 # Rentigo development instructions
 
 - Read all docs before changing scope. `docs/PRD.md` is the functional source of truth. Preserve existing approved documentation.
+- Read [My Project Status](docs/MY_PROJECT_STATUS.md) before starting work to understand completed milestones and the next proposed step. After implementing a major feature or milestone, update that file in the same change with its date, actual completion status, scope, validation results, limitations, and relevant document links. Preserve previous milestone history; update existing entries for refinements rather than duplicating them. Distinguish mock/frontend work from working backend functionality, and record only checks actually performed. This progress log does not override product requirements or authorize the next phase.
 - Current deliverable is scaffold only. No donations, buying, real payments, production connections, or deployment without authorization.
 - User-requested stack: Next.js App Router, strict TypeScript, Tailwind, Mongoose/Atlas, Cloudinary, Zod; eventual Netlify hosting.
 - Keep components reusable. Pages orchestrate UI; server services own use cases; repositories own database access; models define persistence.
