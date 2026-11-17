@@ -1,0 +1,16 @@
+import Link from "next/link";
+import Image from "next/image";
+import type { ListingPreview } from "@/types/listing";
+import { formatINR } from "@/lib/money";
+
+export function ProductIllustration({ kind }: { kind: ListingPreview["illustration"] }) {
+  return <div className={`product-art art-${kind}`} aria-hidden="true"><svg viewBox="0 0 400 280" fill="none">{kind === "tent" ? <><path d="M60 220 200 50 340 220Z" fill="#9b694c"/><path d="m200 50 5 170H60Z" fill="#c29c77"/><path d="m200 90 70 130H170Z" fill="#453e32"/><path d="M40 224h320" stroke="#5d5546" strokeWidth="3"/></> : kind === "drill" ? <><rect x="95" y="76" width="165" height="72" rx="15" fill="#677160"/><path d="m157 144 55-2-12 77h-57Z" fill="#424c40"/><rect x="130" y="212" width="86" height="25" rx="7" fill="#303b32"/><rect x="258" y="89" width="37" height="43" rx="5" fill="#44443f"/><path d="M295 111h42" stroke="#66665c" strokeWidth="10"/><path d="M111 94h64" stroke="#a9ae9f" strokeWidth="7"/></> : <><rect x="73" y="95" width="254" height="112" rx="24" fill="#d0c9ba"/><path d="M90 106h180" stroke="#ede9df" strokeWidth="8"/><circle cx="268" cy="153" r="34" fill="#4c5049"/><circle cx="268" cy="153" r="24" fill="#77887e"/><circle cx="268" cy="153" r="12" fill="#c4d0bf"/><path d="M101 145h74m-74 12h74m-74 12h74" stroke="#9b9588" strokeWidth="4"/></>}</svg><span className="art-caption">Illustrative preview</span></div>;
+}
+export function ProductMedia({ listing, priority = false, className = "" }: { listing: ListingPreview; priority?: boolean; className?: string }) {
+  if (!listing.image) return <ProductIllustration kind={listing.illustration}/>;
+  return <div className={`product-photo ${className}`}><Image src={listing.image.src} alt={listing.image.alt} fill priority={priority} sizes="(max-width: 640px) calc(100vw - 64px), (max-width: 1000px) 45vw, 30vw"/></div>;
+}
+export function ProductCard({ listing, editorial = false }: { listing: ListingPreview; editorial?: boolean }) {
+  if (editorial) return <article className="catalog-card"><Link href={`/items/${listing.id}`} className="catalog-card-link"><div className="catalog-card-image"><ProductMedia listing={listing}/><span className="catalog-image-label">{listing.editorialLabel ?? listing.category}</span><div className="catalog-image-caption"><span><span className="status-dot"/>Illustrative rental</span><span>{listing.area}</span></div></div><div className="catalog-card-heading"><div><p className="catalog-area">{listing.area} · Vijayawada</p><h3>{listing.title}</h3></div><p className="catalog-rate">{formatINR(listing.dailyRatePaise)}<span>/ day</span></p></div><p className="catalog-description">{listing.description}</p><div className="catalog-card-footer"><span>{listing.category}</span><span>View example <span aria-hidden="true">↗</span></span></div></Link></article>;
+  return <article className="product-card"><Link href={`/items/${listing.id}`}><ProductMedia listing={listing}/><div className="product-meta"><span>{listing.category}</span><span>{listing.area}</span></div><h3>{listing.title}</h3><p className="product-price">{formatINR(listing.dailyRatePaise)} <span>/ day</span><span className="product-arrow" aria-hidden="true">↗</span></p></Link></article>;
+}
