@@ -1,4 +1,4 @@
-﻿# Local Rental Platform Product Requirements Document
+# Local Rental Platform Product Requirements Document
 
 Version 0.1 | 14 November 2026 | For founder review
 
@@ -243,3 +243,8 @@ Reviewer notes:
 - Decisions confirmed:
 - Questions for the next discussion:
 
+## 17 Listing draft entry flow — confirmed 17 November 2026
+
+Listing creation begins with a visual category selection, followed by item details and then rental details. Use the existing category options with small representative illustrations; selecting a category is required before continuing. Item name, category and owner-reported condition are required even to save a private draft. If the condition is “has issues”, require a short explanation. Existing incomplete drafts must be completed to this baseline when next saved; do not delete them or publish them automatically.
+
+Drafts can still omit prices, approximate value, deposit and pickup area until a later edit. Publishing continues to require all fields specified in section 6, including photos and availability. The refundable deposit and estimated current value remain separate owner-entered amounts, as confirmed by the user; no automatic deposit formula is introduced. A saved draft is private and cannot receive rental requests.
