@@ -24,13 +24,13 @@ export async function getOwnDraft(id: string) {
 export async function saveNewDraft(input: unknown) {
   const owner = await draftOwner();
   const parsed = draftFields.safeParse(input);
-  if (!parsed.success) throw new DraftError(400, "INVALID_INPUT", "Choose a category and condition, enter an item name, and describe any issues. Check field lengths and nonnegative prices.");
+  if (!parsed.success) throw new DraftError(400, "INVALID_INPUT", "Choose a category and condition, enter an item name and pickup area, and describe any issues. Check field lengths and nonnegative prices.");
   return repository.createDraft(owner, parsed.data);
 }
 export async function saveExistingDraft(id: string, input: unknown) {
   const owner = await draftOwner(); checkId(id);
   const parsed = draftUpdate.safeParse(input);
-  if (!parsed.success) throw new DraftError(400, "INVALID_INPUT", "Check your draft fields and prices, then try again.");
+  if (!parsed.success) throw new DraftError(400, "INVALID_INPUT", "Enter a pickup area and check your required draft fields and prices, then try again.");
   const { expectedVersion, ...fields } = parsed.data;
   const updated = await repository.updateDraft(owner, id, expectedVersion, fields);
   if (updated) return updated;

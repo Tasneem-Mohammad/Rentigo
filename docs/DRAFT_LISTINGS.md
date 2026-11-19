@@ -1,5 +1,15 @@
 # Private draft listings
 
+## Save-flow refinement — 19 November 2026
+
+The user confirmed approximate pickup area is required for private drafts. UI and server validation reject missing/whitespace-only areas; existing records remain readable and need an area on their next details save. The saved-draft photo editor now appears inside step 3 after the details, before the final save action, rather than beneath the entire form. Photo changes continue saving immediately with shared version/conflict handling. Both successful creation and editing return to `/listings?saved=1`, where My Listings shows a private-save confirmation. Validation failures and conflicts keep the user in the form. First-time creation still explicitly saves the draft before photos can be managed: return to My Listings and choose Edit draft. No silent creation, publishing or price/deposit policy changes were introduced. Earlier optional-area descriptions below describe the preceding draft baseline.
+
+Validation: `node scripts/check-draft-journey.mjs` and the isolated photo regression passed, along with lint, TypeScript and the Webpack production build. The journey test covers missing/blank/trimmed areas on create/update and the model, photo placement before Save, Continue without persistence, non-save submitters, photo-operation blocking/shared version, zero deposit, both success redirects and conflict retention. Browser inspection of the user's existing draft confirmed the required pickup-area label and photo region before Save, retaining its existing image and values. No live save or photo mutation was performed during that inspection; final browser save/navigation acceptance is left for the user's next test. The older live account-creation test script was updated for required areas but was not rerun.
+
+## Photo follow-up — 18 November 2026
+
+Saved drafts now support an owner-only Cloudinary photo editor, separate from the guided text/details save. Cloudinary configuration and live acceptance are pending. See [Private draft photos](LISTING_PHOTOS.md) for setup, API behavior, authenticated image delivery, cleanup limitations and tests. References below to no uploads describe the original draft-only increment.
+
 ## Delivered scope
 
 An active signed-in user can save an item privately, find it in My Listings, and edit it later. Identity verification is not required for drafts. There is no publishing endpoint or status transition, and drafts cannot receive rental requests. Existing public pages continue to use sample data and never query private drafts.

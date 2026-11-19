@@ -6,6 +6,7 @@ assert.ok(["localhost", "127.0.0.1"].includes(new URL(base).hostname));
 assert.equal(process.env.RENTIGO_ALLOW_TEST_ACCOUNT, "true");
 const stamp = Date.now();
 async function request(path, method = "GET", body, cookie = "", origin = base) {
+  if (body && path.startsWith("/api/v1/me/listings") && (method === "POST" || method === "PATCH")) body = { areaLabel: "Patamata", ...body };
   return fetch(base + path, { method, headers: { Origin: origin, "Content-Type": "application/json", Cookie: cookie }, ...(body === undefined ? {} : { body: JSON.stringify(body) }) });
 }
 async function account(label) {
@@ -27,6 +28,8 @@ assert.equal((await request(path, "POST", { title: " ", category: "Tools", condi
 assert.equal((await request(path, "POST", { title: "Missing category", condition: "working_well" }, owner)).status, 400);
 assert.equal((await request(path, "POST", { title: "Missing condition", category: "Tools" }, owner)).status, 400);
 assert.equal((await request(path, "POST", { title: "Needs explanation", category: "Tools", condition: "has_issues" }, owner)).status, 400);
+assert.equal((await request(path, "POST", { title: "Missing pickup", category: "Tools", condition: "working_well", areaLabel: undefined }, owner)).status, 400);
+assert.equal((await request(path, "POST", { title: "Blank pickup", category: "Tools", condition: "working_well", areaLabel: "   " }, owner)).status, 400);
 const create = await request(path, "POST", { title: `Private draft test ${stamp}`, category: "Tools", condition: "working_well" }, owner);
 assert.equal(create.status, 201, `Creation returned ${create.status}`);
 assert.match(create.headers.get("cache-control"), /no-store/);

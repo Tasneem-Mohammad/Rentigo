@@ -1,3 +1,4 @@
+export interface DraftPhoto { id: string; url: string; width: number; height: number; }
 export interface DraftListing {
   id: string;
   title: string;
@@ -12,4 +13,6 @@ export interface DraftListing {
   status: "draft";
   version: number;
   updatedAt: string;
+  photos: DraftPhoto[];
+  pendingPhotoIds: string[];
 }

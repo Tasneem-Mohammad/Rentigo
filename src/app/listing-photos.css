@@ -1,0 +1,20 @@
+.draft-photos { border-top:1px solid var(--line); margin-top:48px; padding-top:36px; }
+.photo-section-heading { display:flex; align-items:center; justify-content:space-between; gap:20px; }
+.photo-section-heading h2 { font-size:clamp(28px,3vw,36px); margin-bottom:12px; }
+.photo-section-heading > span { white-space:nowrap; color:var(--muted); font-size:13px; }
+.draft-photos > p,.photo-pending p { font-size:14px; line-height:1.8; max-width:700px; }
+.photo-empty { border:1px dashed var(--line); padding:28px; background:var(--panel-low); }
+.draft-photo-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:20px; list-style:none; padding:0; }
+.draft-photo-grid li { min-width:0; }
+.draft-photo-grid img { display:block; width:100%; height:auto; aspect-ratio:4/3; object-fit:cover; border-radius:3px; background:var(--panel); }
+.photo-controls { display:flex; align-items:center; flex-wrap:wrap; gap:10px; padding-top:12px; font-size:12px; }
+.photo-controls > span { flex-basis:100%; color:var(--muted); }
+.photo-controls button { background:transparent; border:0; color:var(--accent); text-decoration:underline; text-underline-offset:3px; padding:8px 0; min-height:44px; cursor:pointer; }
+.photo-controls button:disabled { opacity:.5; cursor:wait; }
+.photo-upload-field { display:grid; gap:12px; margin-top:24px; font-size:14px; }
+.photo-upload-field input { max-width:100%; border:1px solid var(--line); padding:14px; border-radius:3px; }
+.draft-photos progress { display:block; width:100%; accent-color:var(--accent); margin-top:20px; }
+.photo-pending { border-top:1px solid var(--line); margin-top:28px; padding-top:20px; }
+.photo-pending-row { display:flex; align-items:center; flex-wrap:wrap; gap:12px; margin-top:15px; font-size:13px; }
+@media(max-width:700px) { .draft-photo-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; }.photo-section-heading { align-items:start; }.photo-section-heading > span { padding-top:8px; } }
+@media(max-width:380px) { .draft-photo-grid { grid-template-columns:1fr; }.photo-section-heading { flex-direction:column; gap:0; } }

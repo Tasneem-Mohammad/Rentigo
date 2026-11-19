@@ -66,7 +66,7 @@ Unused hooks, booking components and domain implementation files are intentional
 
 ## Private listing drafts
 
-Signed-in owners can save, view and edit incomplete private listings. See [Draft listings](docs/DRAFT_LISTINGS.md) for scope, API details and validation. Photos, availability and publishing are not included yet.
+Signed-in owners can save, view and edit incomplete private listings. See [Draft listings](docs/DRAFT_LISTINGS.md) for scope, API details and validation. Saved drafts now include a photo editor for signed Cloudinary uploads, cover selection and removal; it remains disabled until development Cloudinary is configured. See [Photo setup and acceptance](docs/LISTING_PHOTOS.md). Availability and publishing are not included yet.
 
 ## Stitch homepage review
 

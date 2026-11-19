@@ -10,7 +10,7 @@ export const draftFields = z.object({
   dailyRatePaise: money,
   approximateValuePaise: money,
   depositPaise: money,
-  areaLabel: z.string().trim().max(120).default(""),
+  areaLabel: z.string().trim().min(1, "Enter an approximate pickup area.").max(120),
 }).strict().refine(fields => fields.condition !== "has_issues" || fields.conditionNote.length > 0, { path: ["conditionNote"], message: "Describe the item’s issues." });
 export const draftUpdate = draftFields.safeExtend({ expectedVersion: z.number().int().min(0) }).strict();
 export type DraftFields = z.infer<typeof draftFields>;
