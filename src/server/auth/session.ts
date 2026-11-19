@@ -2,16 +2,23 @@ import "server-only";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { getAuth } from "./auth";
-import { authEnabled } from "./config";
+import { authConfig, authEnabled } from "./config";
 
-export async function currentSession() {
+async function rawSession() {
   if (!authEnabled()) return null;
   return getAuth().api.getSession({ headers: await headers() });
 }
+export async function currentSession() {
+  const session = await rawSession();
+  // Sessions created during the development bypass cannot retain private access.
+  if (session && authConfig().verificationRequired && !session.user.emailVerified) return null;
+  return session;
+}
 export async function requireUser() {
-  const session = await currentSession();
-  if (!session) redirect("/signup");
+  const session = await rawSession();
+  if (!session) redirect("/login");
   if (session.user.accountStatus !== "active") redirect("/account-restricted");
+  if (authConfig().verificationRequired && !session.user.emailVerified) redirect("/verify-email");
   return session;
 }
 export async function requireAdmin() {

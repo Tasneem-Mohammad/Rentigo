@@ -298,3 +298,14 @@ svg { flex-shrink:0; }
 .profile-details .definition-row { align-items:flex-start; }
 .profile-details dt { flex:0 0 42%; min-width:0; overflow-wrap:anywhere; }
 .profile-details dd { flex:1 1 0; min-width:0; overflow-wrap:anywhere; }
+.email-verification-status { display:inline-flex; align-items:center; gap:8px; max-width:100%; padding:7px 11px; border:1px solid var(--line); border-radius:3px; color:var(--accent); background:var(--panel-low); font-size:13px; line-height:1.5; text-align:left; }
+.email-verification-status svg { flex-shrink:0; }
+.email-verification-status.is-verified { color:#425c40; background:#edf2e9; border-color:#c8d5bf; }
+.email-verification-step { margin-top:24px; }
+.email-verification-step > p { margin-top:18px; font-size:14px; line-height:1.8; }
+.email-verification-step > .text-link { display:inline-block; margin-top:24px; }
+.auth-success > .email-verification-status { margin-bottom:24px; }
+.verification-resend { text-align:left; }
+.verification-resend summary { cursor:pointer; font-size:14px; font-weight:600; padding-block:6px; }
+.verification-resend > p { margin-top:12px; font-size:13px; line-height:1.8; }
+.verification-resend .form-stack { margin-top:18px; }
