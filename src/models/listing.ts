@@ -22,11 +22,18 @@ const schema = new Schema({
   availableFrom: { type: String, default: null },
   availableUntil: { type: String, default: null },
   photos: { type: [photoSchema], default: [] },
-  status: { type: String, enum: ["draft"], default: "draft", required: true },
+  status: { type: String, enum: ["draft", "active"], default: "draft", required: true },
+  prototypePublished: { type: Boolean, default: false },
   currency: { type: String, enum: ["INR"], default: "INR", immutable: true },
   version: { type: Number, default: 0, required: true },
   schemaVersion: { type: Number, default: 1, immutable: true },
 }, { timestamps: true, versionKey: false, strict: "throw", autoIndex: false });
 schema.index({ ownerId: 1, status: 1, updatedAt: -1 });
 export type ListingRecord = InferSchemaType<typeof schema>;
+// Next dev reloads modules while Mongoose retains compiled models. Do not reuse
+// the old draft-only schema after adding publication fields during development.
+const cached = mongoose.models.Listing;
+if (process.env.NODE_ENV === "development" && cached && (!cached.schema.path("prototypePublished") || !cached.schema.path("status")?.options.enum?.includes("active"))) {
+  mongoose.deleteModel("Listing");
+}
 export const Listing: Model<ListingRecord> = (mongoose.models.Listing as Model<ListingRecord> | undefined) ?? mongoose.model<ListingRecord>("Listing", schema, "listings");

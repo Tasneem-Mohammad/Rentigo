@@ -12,7 +12,7 @@ export interface DraftListing {
   areaLabel: string;
   availableFrom: string | null;
   availableUntil: string | null;
-  status: "draft";
+  status: "draft" | "active";
   version: number;
   updatedAt: string;
   photos: DraftPhoto[];

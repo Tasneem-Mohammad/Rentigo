@@ -252,3 +252,9 @@ Drafts can still omit prices, approximate value and deposit until a later edit. 
 ### Private draft management — confirmed 19 November 2026
 
 Owners can permanently delete their own private drafts after confirmation. Block a second draft for the same owner, category and normalized item name (case and extra whitespace ignored). Different owners or categories may reuse a name. This is a name/category check, not image-based identification of a physical product. Do not automatically merge or delete existing duplicates; owners choose which to retain. Deletion removes the listing record; track any image cleanup separately until upload authorizations expire.
+
+### Local prototype publication — confirmed 20 November 2026
+
+To continue the working MVP incrementally, identity and eligibility integration is postponed for explicitly enabled local development. Active, signed-in owners with verified email can publish complete listings in this local prototype and withdraw them to edit privately. Draft saving remains optional; all section 6 fields are required for publishing. Published prototypes appear in Explore and item details, separate from fictional examples. Duplicate-name checks cover the owner's drafts and published items in the same category.
+
+This exception does not mark an account identity-verified or eligible for rental transactions. Keep genuine identity/eligibility verification as later work before public launch. The exception is disabled in production even if the local flag is set. Messaging, rental requests, bookings and payments are separate increments and remain unavailable here.

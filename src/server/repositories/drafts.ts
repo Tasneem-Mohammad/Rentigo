@@ -5,6 +5,7 @@ import type { DraftFields } from "@/server/validation/draft-listing";
 import type { ClientSession } from "mongoose";
 import { draftName } from "@/lib/draft-name";
 import { draftDto } from "./draft-dto";
+import { prototypePublishingEnabled } from "@/server/prototype-publishing";
 export async function createDraft(ownerId: string, fields: DraftFields) {
   return ownerWrite(ownerId, async session => {
     await uniqueName(ownerId, fields.title, fields.category, session);
@@ -13,7 +14,7 @@ export async function createDraft(ownerId: string, fields: DraftFields) {
 }
 export async function listDrafts(ownerId: string) {
   await connectDatabase();
-  return (await Listing.find({ ownerId, status: "draft" }).sort({ updatedAt: -1, _id: -1 }).limit(100).lean()).map(draftDto);
+  return (await Listing.find({ ownerId, status: { $in: ["draft", "active"] } }).sort({ updatedAt: -1, _id: -1 }).limit(100).lean()).map(draftDto);
 }
 export async function findDraft(ownerId: string, id: string) {
   await connectDatabase();
@@ -39,8 +40,8 @@ async function ownerWrite<T>(ownerId: string, work: (session: ClientSession) => 
   }
 }
 async function uniqueName(ownerId: string, title: string, category: DraftFields["category"], session: ClientSession, excluding?: string) {
-  const records = await Listing.find({ ownerId, category, status: "draft", ...(excluding ? { _id: { $ne: excluding } } : {}) }).select("title").session(session).lean();
-  if (records.some(record => draftName(record.title) === draftName(title))) throw new DuplicateDraftError("You already have a draft with this item name. Edit the existing draft or use a distinct name.");
+  const records = await Listing.find({ ownerId, category, status: { $in: ["draft", "active"] }, ...(excluding ? { _id: { $ne: excluding } } : {}) }).select("title").session(session).lean();
+  if (records.some(record => draftName(record.title) === draftName(title))) throw new DuplicateDraftError("You already have an item with this name in this category. Edit the existing item or use a distinct name.");
 }
 export async function updateDraft(ownerId: string, id: string, version: number, fields: DraftFields) {
   return ownerWrite(ownerId, async session => {
@@ -58,5 +59,24 @@ export async function deleteDraft(ownerId: string, id: string, version: number) 
     const connection = await connectDatabase();
     if (record.photos?.length) await connection.connection.collection("draftPhotoCleanup").insertMany(record.photos.map(photo => ({ publicId: photo.publicId, notBefore: new Date(Math.max(Date.now(), photo.expiresAt.getTime())) })), { session });
     return true;
+  });
+}
+
+export async function publishPrototype(ownerId: string, id: string, version: number) {
+  if (!prototypePublishingEnabled()) return null;
+  return ownerWrite(ownerId, async session => {
+    const existing = await Listing.findOne({ _id: id, ownerId, status: "draft", version }).session(session).lean();
+    if (!existing) return null;
+    await uniqueName(ownerId, existing.title, existing.category, session, id);
+    const record = await Listing.findOneAndUpdate({ _id: id, ownerId, status: "draft", version }, { $set: { status: "active", prototypePublished: true }, $inc: { version: 1 } }, { session, returnDocument: "after", runValidators: true }).lean();
+    return record ? draftDto(record) : null;
+  });
+}
+
+export async function withdrawPrototype(ownerId: string, id: string, version: number) {
+  // Withdrawal is always allowed, including after the prototype flag is disabled.
+  return ownerWrite(ownerId, async session => {
+    const record = await Listing.findOneAndUpdate({ _id: id, ownerId, status: "active", prototypePublished: true, version }, { $set: { status: "draft", prototypePublished: false }, $inc: { version: 1 } }, { session, returnDocument: "after", runValidators: true }).lean();
+    return record ? draftDto(record) : null;
   });
 }

@@ -79,6 +79,13 @@ assert.equal(requests.at(-1).method, "POST"); assert.deepEqual(destinations, ["/
 state = []; destinations.length = 0; status = 409;
 tree = render(); next(tree); await save(render());
 assert.deepEqual(destinations, []); assert.equal(named(render(), "DraftPhotos").props.disabled, true);
+const conflicted = render();
+assert.equal(nodes(conflicted).find(node => node.type === "fieldset").props.disabled, false, "Conflict must not disable step navigation or text selection");
+assert.ok(nodes(conflicted).filter(node => node.props.name === "draftAction").every(node => node.props.disabled), "Conflicted saves stay blocked");
+nodes(conflicted).find(node => node.props.children === "← Back").props.onClick();
+assert.equal(nodes(render()).find(node => node.props["data-item-details"] !== undefined).props.hidden, false, "Back reveals retained item details");
+const beforeConflictRetry = requests.length;
+await save(render()); assert.equal(requests.length, beforeConflictRetry, "Navigation cannot retry a stale save");
 console.log("PASS: required/trimmed pickup area on create/update/model, photos before final Save, no Continue/accidental-submit writes, upload/save coordination and shared version, zero deposit, create/edit return to My Listings, and conflict retention. UI/persistence mocked; live acceptance remains manual.");
 
 const dates = load("lib/listing-availability.ts");
@@ -121,3 +128,26 @@ control=deletion();await nodes(control).find(node=>node.props.children==="Delete
 assert.equal(requests.at(-1).method,"DELETE");assert.equal(JSON.parse(requests.at(-1).body).expectedVersion,2);
 assert.deepEqual(destinations,["/listings?deleted=1"]);
 console.log("PASS: duplicate correction stays editable; delete icon is labelled, confirmation/cancel do not write, confirmed deletion sends version and returns to My Listings.");
+
+state=[];requests.length=0;destinations.length=0;status=200;errorCode="VERSION_CONFLICT";
+tree=render(creation);named(tree,"CategoryPicker").props.onChange("Tools");next(render(creation));
+tree=render(creation);nodes(tree).find(node=>node.type==="input"&&node.props.value==="working_well").props.onChange();next(render(creation));
+await save(render(creation),values,new HTMLButtonElement("draftAction","photos"));
+assert.deepEqual(destinations,[],"Preparing photos stays on the creation page");
+assert.equal(requests[0].method,"POST");
+assert.equal(named(render(creation),"DraftPhotos").props.draft.id,"test-id");
+assert.ok(nodes(render(creation)).some(node=>node.props.value==="publish"&&node.props.children==="Publish listing"));
+await save(render(creation));
+assert.equal(requests.at(-1).method,"PATCH","Later save reuses the prepared listing, not another create");
+assert.equal(JSON.parse(requests.at(-1).body).expectedVersion,10);
+assert.deepEqual(destinations,["/listings?saved=1"]);
+console.log("PASS: same-page creation photo preparation, stable record/version reuse and primary Publish listing action.");
+
+state=[];requests.length=0;destinations.length=0;status=200;
+tree=render();next(tree);
+await save(render(),values,new HTMLButtonElement("draftAction","publish"));
+assert.equal(requests.length,2,"Publish saves details then requests the server transition");
+assert.equal(requests[0].method,"PATCH");
+assert.equal(requests[1].method,"POST");
+assert.deepEqual(destinations,["/?published=test-id"],"A successful publish returns home with publication confirmation");
+console.log("PASS: successful publish returns home with the saved listing confirmation.");

@@ -1,5 +1,16 @@
 # Private draft listings
 
+## Creation flow with publishing gates — 20 November 2026
+
+The user approved using the current design to make publishing the primary journey, with Save as draft secondary. New listings can now prepare photos on the same page: after entering required item/pickup details, Add photos explicitly creates private backing data and enables the existing upload editor without a redirect. The current record ID and version are retained for subsequent updates, avoiding another create when the owner later saves. Text changes are still explicitly saved. No autosave is claimed.
+
+The final actions are Publish listing (primary) and Save as draft (secondary). Saving as draft returns to My Listings. A publish attempt saves the current details privately, checks completeness on the server, and shows an actionable missing-details or account-gate message on the form. Completed photos, rental price/deposit/value and paired availability dates are required for readiness. Existing ownership, session, active-account, version, duplicate and origin checks remain enforced.
+
+**Real public publication is still unavailable.** The `/api/v1/me/listings/:id/publish` POST endpoint has no successful publication transition: after completeness and email checks it explicitly blocks until the genuine identity/eligibility integration and publishing rollout are implemented. The model remains draft-only; public Explore remains mock data; account capabilities remain false. Neither client flags nor complete fields can bypass this rollout gate. This is the approved creation-flow/UI preparation with honest gates, not a completed public marketplace feature. Unresolved price/deposit policies must be finalized before enabling that transition.
+
+Tests cover same-page preparation, stable ID/version reuse, optional draft-save redirects, incomplete/unverified publishing rejection and the complete/email-verified rollout block. Full browser upload/creation acceptance remains pending. Earlier sections describing mandatory Save → leave → Edit before photos refer to the previous flow.
+
+
 ## Deletion and duplicate prevention — 19 November 2026
 
 My Listings has a labelled trash icon, a permanent-delete confirmation and Cancel. The owner-only DELETE endpoint requires configured origin, strict JSON, an active session, ownership, draft status and expected version. It hard-deletes the listing document; stale deletes receive 409, foreign/missing records 404. Success returns to My Listings with a deletion notice. Existing user duplicates are not automatically removed.
@@ -81,3 +92,7 @@ The user subsequently reported that Atlas connectivity was restored. The revised
 18 November checkpoint: the supplied manual review confirmed category selection, required-field checks, retained values, refresh persistence and zero deposit. It identified Continue unexpectedly saving during a step transition. Continue and Save now have separate React keys, Continue cancels its default click action, and persistence requires the named Save submitter. Lint, TypeScript and production build passed after the fix. The user reported the result looks good and plans another check; the final browser regression is not claimed complete.
 
 Review the private draft flow, then add Cloudinary photo uploads to these same draft records. Availability and publishing readiness follow separately. Final publishing requires approved item/category policy, all PRD fields, genuine identity verification and transaction eligibility; development draft access does not bypass those requirements.
+
+## Current publication scope — 20 November 2026
+
+The historical draft-only descriptions above describe earlier increments. The user has now approved explicitly enabled local prototype publication: complete, email-verified owner listings can become active and appear in prototype discovery. Identity and eligibility integration is deferred for local development only and retained before public launch; production remains blocked. My Listings includes drafts and published prototypes. Withdrawal restores private editing; deletion remains draft-only. See [Local prototype publishing](PROTOTYPE_PUBLISHING.md) for the current controls and flow.
