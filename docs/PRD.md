@@ -1,4 +1,4 @@
-﻿# Local Rental Platform Product Requirements Document
+# Local Rental Platform Product Requirements Document
 
 Version 0.1 | 14 November 2026 | For founder review
 
@@ -243,3 +243,18 @@ Reviewer notes:
 - Decisions confirmed:
 - Questions for the next discussion:
 
+## 17 Listing draft entry flow — confirmed 17 November 2026
+
+Listing creation begins with a visual category selection, followed by item details and then rental details. Use the existing category options with small representative illustrations; selecting a category is required before continuing. Item name, category and owner-reported condition are required even to save a private draft. If the condition is “has issues”, require a short explanation. Existing incomplete drafts must be completed to this baseline when next saved; do not delete them or publish them automatically.
+
+Drafts can still omit prices, approximate value and deposit until a later edit. On 19 November 2026, the user confirmed that an approximate pickup area is required even to save a private draft. Collect a neighbourhood/area label, not the exact home address. Existing drafts remain readable and must supply the pickup area on their next details save. Publishing continues to require all fields specified in section 6, including photos and availability. The refundable deposit and estimated current value remain separate owner-entered amounts, as confirmed by the user; no automatic deposit formula is introduced. A saved draft is private and cannot receive rental requests.
+
+### Private draft management — confirmed 19 November 2026
+
+Owners can permanently delete their own private drafts after confirmation. Block a second draft for the same owner, category and normalized item name (case and extra whitespace ignored). Different owners or categories may reuse a name. This is a name/category check, not image-based identification of a physical product. Do not automatically merge or delete existing duplicates; owners choose which to retain. Deletion removes the listing record; track any image cleanup separately until upload authorizations expire.
+
+### Local prototype publication — confirmed 20 November 2026
+
+To continue the working MVP incrementally, identity and eligibility integration is postponed for explicitly enabled local development. Active, signed-in owners with verified email can publish complete listings in this local prototype and withdraw them to edit privately. Draft saving remains optional; all section 6 fields are required for publishing. Published prototypes appear in Explore and item details, separate from fictional examples. Duplicate-name checks cover the owner's drafts and published items in the same category.
+
+This exception does not mark an account identity-verified or eligible for rental transactions. Keep genuine identity/eligibility verification as later work before public launch. The exception is disabled in production even if the local flag is set. Messaging, rental requests, bookings and payments are separate increments and remain unavailable here.

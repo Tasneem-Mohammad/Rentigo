@@ -18,7 +18,7 @@ while (queue.length) {
   }
   console.log(`PASS ${path}`);
 }
-for (const path of ["/items/not-a-listing", "/bookings/not-a-booking", "/not-a-page"]) {
+for (const path of ["/items/not-a-listing", "/not-a-page"]) {
   assert.equal((await fetch(new URL(path, base))).status, 404, `${path} must return 404`);
 }
 const filtered = await (await fetch(`${base}/explore?category=Tools`)).text();
@@ -26,4 +26,4 @@ assert.match(filtered, /href="\/items\/cordless-drill"/);
 assert.doesNotMatch(filtered, /href="\/items\/weekend-tent"/);
 const empty = await (await fetch(`${base}/explore?q=nonexistent-example`)).text();
 assert.match(empty, /No sample listings match/);
-console.log(`Verified ${seen.size} pages/filter URLs, three 404s, category filtering and empty search.`);
+console.log(`Verified ${seen.size} pages/filter URLs, public 404s, category filtering and empty search. Auth redirects are checked separately.`);

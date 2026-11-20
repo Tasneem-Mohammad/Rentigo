@@ -1,8 +1,9 @@
 import "server-only";
 export interface Actor {
   userId: string;
-  roles: Array<"member" | "operator">;
-  communityApproved: boolean;
+  roles: Array<"user" | "admin">;
+  identityStatus: string;
+  eligibilityStatus: string;
 }
 // No implementation or pretend session. Choose an established auth library first.
 export interface SessionProvider {

@@ -1,8 +1,8 @@
+import { cloudinaryEnabled } from "@/lib/cloudinary";
+import "@/app/listing-photos.css";
 import { Container } from "@/components/layout/container";
 import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { PreviewNotice } from "@/components/shared/states";
+import { DraftForm } from "@/components/listings/draft-form";
 export default function CreateListingPage() {
-  return <Container><div className="page-heading"><p className="eyebrow">Give useful things a second moment</p><h1>What will you share?</h1></div><div className="page-content"><PreviewNotice>This listing form is a disabled layout preview. Uploading and publishing are not implemented.</PreviewNotice><Card><div className="form-stack"><Input disabled id="title" label="Item name" placeholder="A short, useful title"/><div className="field"><label htmlFor="category">Category</label><select id="category" disabled><option>Categories pending approval</option></select></div><div className="field"><label htmlFor="photos">Current photos</label><input id="photos" type="file" accept="image/*" disabled/><small>At least one current photo will be required.</small></div><div className="field"><label htmlFor="condition">Basic condition</label><select id="condition" disabled><option>Working well</option><option>Has issues — explanation required</option></select></div><Input disabled id="condition-note" label="Condition explanation (if it has issues)"/><Input disabled id="rate" label="Daily rental price (INR)" type="number"/><Input disabled id="value" label="Approximate current value (INR)" type="number"/><Input disabled id="deposit" label="Refundable deposit (INR)" type="number"/><Input disabled id="area" label="Approximate pickup area" placeholder="For example, Patamata"/><Input disabled id="available-from" label="Available from — preview" type="date"/><Input disabled id="available-to" label="Available until — preview" type="date"/><div className="field"><label htmlFor="description">Short description (optional)</label><textarea disabled id="description" rows={3}/></div><Button disabled>Publish listing — coming later</Button></div></Card></div></Container>;
+  return <Container><div className="page-heading"><p className="eyebrow">Give useful things a second moment</p><h1>What will you share?</h1><p>Start with a category. We’ll guide you through the rest.</p></div><div className="page-content"><Card><DraftForm photosEnabled={cloudinaryEnabled()}/></Card></div></Container>;
 }

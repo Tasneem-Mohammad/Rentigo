@@ -2,7 +2,12 @@ import "server-only";
 import { v2 as cloudinary } from "cloudinary";
 import { getServerEnv } from "@/config/env";
 
-// Configuration only. Signing/upload authorization is deliberately not exposed.
+export function cloudinaryEnabled() {
+  try { return getServerEnv().ENABLE_CLOUDINARY === "true"; }
+  catch { return false; }
+}
+
+// Lazy, server-only configuration; uploads are authorized by the listing service.
 export function getCloudinary() {
   const env = getServerEnv();
   if (env.ENABLE_CLOUDINARY !== "true") throw new Error("Cloudinary access is disabled.");

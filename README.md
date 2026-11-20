@@ -1,6 +1,6 @@
 # Rentigo
 
-Local peer-to-peer rental marketplace for Vijayawada. This repository contains a runnable **scaffold**, not a live rental service. No authentication, persistence, reservations, messaging, moderation, or money movement is implemented.
+Local peer-to-peer rental marketplace for Vijayawada. This repository contains a runnable **scaffold**, not a live rental service. Authentication integration is implemented but disabled until development services are configured and verified. Private listing drafts now persist to MongoDB. Publishing, rentals, messaging, moderation and money movement remain unavailable. See [Authentication setup](docs/AUTHENTICATION.md).
 
 ## Run locally
 
@@ -12,7 +12,7 @@ Copy-Item .env.example .env.local
 npm run dev
 ```
 
-Open http://localhost:3000. Environment setup is optional for the preview; all integrations default to disabled. Never put production secrets in this project without explicit authorization. No provider is contacted by a page or during build.
+Open http://localhost:3000. Environment setup is optional for the preview; all integrations default to disabled. Never put production secrets in this project without explicit authorization. With integrations disabled, pages and builds do not contact providers. Enabling authentication requires an approved development database and email sender.
 
 ```powershell
 npm run lint
@@ -30,14 +30,14 @@ With the production server running, `node scripts/check-navigation.mjs` checks a
 | `/` | Responsive homepage, categories and fictional products |
 | `/explore` | Keyword/category/area filtering of mock listings, including Stitch editorial examples |
 | `/items/cordless-drill`, `/items/weekend-tent`, `/items/home-projector` | Mock item details and disabled request/message controls |
-| `/login`, `/signup` | Disabled account form layouts |
+| `/login`, `/signup` | Account forms; disabled until services are configured |
 | `/dashboard` | Workspace placeholder and navigation |
-| `/listings`, `/listings/new` | Empty listing manager and disabled create form |
+| `/listings`, `/listings/new` | Private draft list and working save-draft form |
 | `/bookings`, `/bookings/preview` | Empty booking list and details layout |
 | `/messages`, `/profile` | Empty account screen layouts |
-| `/admin` | Public operator layout preview with no data or actions |
+| `/admin` | Admin-only layout with no real moderation actions |
 
-`(protected)` is a route organisation label, **not access control**. All previews are public. Add real session, role and participant checks before any private data or mutations. Unknown item and booking identifiers return not-found pages.
+The workspace layout now verifies a server session, and admin layout requires an active admin account. Public browsing remains available. Future business mutations still need independent ownership, participant and identity checks. See docs/AUTHENTICATION.md for setup and unverified integration cases.
 
 ## Structure
 
@@ -54,7 +54,7 @@ src/
     services/           Domain use-case contracts
     repositories/       Persistence contracts
     validation/         Server input schemas
-  models/               Model boundary documentation (no schemas yet)
+  models/               Model boundary documentation (no business schemas except private listings)
   lib/                  Mock data, money formatting and lazy provider utilities
   types/                Public display DTOs
   constants/            Shared navigation
@@ -63,6 +63,10 @@ docs/                   Existing product docs and scaffold decisions
 ```
 
 Unused hooks, booking components and domain implementation files are intentionally omitted. Tailwind v4 uses CSS-first theme configuration in `globals.css` and the PostCSS plugin, rather than a legacy JavaScript Tailwind config. Fonts are bundled locally with Fontsource. Stitch stage one uses Newsreader and Plus Jakarta Sans, with locally saved reference images and Next.js image optimization. No remote image provider is used at runtime.
+
+## Private listing drafts
+
+Signed-in owners can save, view and edit incomplete private listings. See [Draft listings](docs/DRAFT_LISTINGS.md) for scope, API details and validation. Saved drafts now include a photo editor for signed Cloudinary uploads, cover selection and removal; it remains disabled until development Cloudinary is configured. See [Photo setup and acceptance](docs/LISTING_PHOTOS.md). Private drafts now include simple availability date ranges; see [Availability behavior and testing](docs/LISTING_AVAILABILITY.md). Publishing and booking availability enforcement are not included yet.
 
 ## Stitch homepage review
 
