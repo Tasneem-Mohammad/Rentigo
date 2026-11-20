@@ -26,7 +26,7 @@ Complete end-to-end acceptance of local account access, the guided draft journey
 
 ## Next planned milestone
 
-Retest the focused conflict-recovery, pickup-area search and zero-deposit publication fixes, then improve discovery of actual published listings with keyword, category, area and availability filtering. Retain final authentication/email and cross-account acceptance checks. Continue in the agreed order: authentication → real listings → discovery → rental requests. Identity/eligibility verification remains required before public launch; its current exception applies only to local prototype publishing. A hosted preview is under consideration; deployment and changing the local-only gate are not yet approved. See [Local prototype publishing](PROTOTYPE_PUBLISHING.md).
+Retest the focused conflict-recovery, pickup-area search and zero-deposit publication fixes, then improve discovery of actual published listings with keyword, category, area and availability filtering. Retain final authentication/email and cross-account acceptance checks. Continue in the agreed order: authentication → real listings → discovery → rental requests. Identity/eligibility verification remains required before public launch; its current exception applies only to local prototype publishing. Vercel deployment preparation is authorized: first verify the hosted interface, then configure its HTTPS origin and testing services. The application is not yet deployed; changing the local-only publishing gate remains a separate decision. See [Vercel setup](VERCEL_SETUP.md). See [Local prototype publishing](PROTOTYPE_PUBLISHING.md).
 
 For requirements, see [PRD](PRD.md). For the proposed development sequence, see [Development roadmap](DEVELOPMENT_ROADMAP.md).
 

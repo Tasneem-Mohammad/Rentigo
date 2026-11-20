@@ -258,3 +258,7 @@ Owners can permanently delete their own private drafts after confirmation. Block
 To continue the working MVP incrementally, identity and eligibility integration is postponed for explicitly enabled local development. Active, signed-in owners with verified email can publish complete listings in this local prototype and withdraw them to edit privately. Draft saving remains optional; all section 6 fields are required for publishing. Published prototypes appear in Explore and item details, separate from fictional examples. Duplicate-name checks cover the owner's drafts and published items in the same category.
 
 This exception does not mark an account identity-verified or eligible for rental transactions. Keep genuine identity/eligibility verification as later work before public launch. The exception is disabled in production even if the local flag is set. Messaging, rental requests, bookings and payments are separate increments and remain unavailable here.
+
+### Hosting revision — confirmed 20 November 2026
+
+The user selected Vercel for hosted testing instead of the earlier Netlify proposal in section 15. Start with the interface deployment, then configure the assigned HTTPS origin and separate testing services before enabling accounts. This does not approve public rental launch or extend the local-only publishing exception. See [Vercel setup](VERCEL_SETUP.md).
