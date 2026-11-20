@@ -1,5 +1,20 @@
 # Private draft listings
 
+## Deletion and duplicate prevention — 19 November 2026
+
+My Listings has a labelled trash icon, a permanent-delete confirmation and Cancel. The owner-only DELETE endpoint requires configured origin, strict JSON, an active session, ownership, draft status and expected version. It hard-deletes the listing document; stale deletes receive 409, foreign/missing records 404. Success returns to My Listings with a deletion notice. Existing user duplicates are not automatically removed.
+
+Create and rename/category-change operations reject the same normalized title in the same category for the same owner. NFKC normalization, case folding and whitespace normalization are used. Existing legacy duplicates can retain their unchanged title while editing other details; creating another or renaming into a collision is blocked. Errors leave the form editable. Names do not identify matching photographs or differently named physical products.
+
+MongoDB transactions serialize metadata mutations with one `draftOwnerLocks` revision document per owner, preventing concurrent create/rename races across app instances without a destructive backfill or new unique-title index. The existing listing owner/status/version filters still fence photo changes and deletion. Atlas replica-set transactions and CRUD/create-collection permissions are required. No external service or in-process correctness lock is introduced.
+
+Deletion atomically records provider IDs in `draftPhotoCleanup` before the draft disappears. Entries become due only after their original upload reservation expires, preventing late uploads from recreating already-cleaned assets. No full draft contents are retained in the queue. Run `node --env-file=.env.local scripts/cleanup-deleted-draft-photos.mjs` for a dry run; add `--apply` for due development assets. Failed provider deletions retain queue entries for retry. This is an explicit maintenance command, not a scheduled job; schedule cleanup before external rollout.
+
+Isolated management, form and photo regressions passed. An opt-in live Atlas regression passed concurrent duplicate prevention, owner/category scope, rename collision, stale/foreign deletion rejection, hard deletion and name reuse. It used new labelled disposable QA owner IDs, no photos/auth accounts, and removed its drafts/locks afterward. The live browser delete confirmation and deletion image-cleanup path still need manual acceptance. Lint, TypeScript and the Webpack production build passed for the implementation.
+
+After a successful details save the app continues to `/listings?saved=1`. Drafts stay private; Edit draft reopens details, photos and availability. Publishing/readiness and real discovery are later increments, not side effects of saving.
+
+
 ## Save-flow refinement — 19 November 2026
 
 The user confirmed approximate pickup area is required for private drafts. UI and server validation reject missing/whitespace-only areas; existing records remain readable and need an area on their next details save. The saved-draft photo editor now appears inside step 3 after the details, before the final save action, rather than beneath the entire form. Photo changes continue saving immediately with shared version/conflict handling. Both successful creation and editing return to `/listings?saved=1`, where My Listings shows a private-save confirmation. Validation failures and conflicts keep the user in the form. First-time creation still explicitly saves the draft before photos can be managed: return to My Listings and choose Edit draft. No silent creation, publishing or price/deposit policy changes were introduced. Earlier optional-area descriptions below describe the preceding draft baseline.

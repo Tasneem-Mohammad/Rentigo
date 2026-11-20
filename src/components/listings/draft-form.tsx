@@ -5,6 +5,9 @@ import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { CategoryPicker } from "./category-picker";
+import { ListingAvailability } from "./listing-availability";
+import { availabilityError } from "@/lib/listing-availability";
+import "@/app/listing-availability.css";
 import { DraftPhotos } from "./draft-photos";
 import type { DraftListing } from "@/types/draft-listing";
 
@@ -38,6 +41,8 @@ export function DraftForm({ draft, photosEnabled = false }: { draft?: DraftListi
   const [conflict, setConflict] = useState(false);
   const [version, setVersion] = useState(draft?.version ?? 0);
   const [condition, setCondition] = useState(draft?.condition ?? "");
+  const [availableFrom, setAvailableFrom] = useState(draft?.availableFrom ?? null);
+  const [availableUntil, setAvailableUntil] = useState(draft?.availableUntil ?? null);
   async function save(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault(); if (busy || photoBusy || conflict) return; if (step < 2) { next(); return; }
     const submitter = (event.nativeEvent as SubmitEvent).submitter;
@@ -45,12 +50,14 @@ export function DraftForm({ draft, photosEnabled = false }: { draft?: DraftListi
     const form = new FormData(event.currentTarget);
     const areaLabel = String(form.get("areaLabel") ?? "").trim();
     if (!areaLabel) { setMessage("Enter an approximate pickup area before saving your draft."); event.currentTarget.querySelector<HTMLInputElement>("#areaLabel")?.focus(); return; }
+    const dateError = availabilityError(availableFrom, availableUntil);
+    if (dateError) { setMessage(dateError); return; }
     setMessage(""); setBusy(true);
     try {
-      const body = { title: String(form.get("title") ?? ""), category, description: String(form.get("description") ?? ""), condition, conditionNote: String(form.get("conditionNote") ?? ""), dailyRatePaise: paise(form.get("rate")), approximateValuePaise: paise(form.get("value")), depositPaise: paise(form.get("deposit")), areaLabel, ...(draft ? { expectedVersion: version } : {}) };
+      const body = { title: String(form.get("title") ?? ""), category, description: String(form.get("description") ?? ""), condition, conditionNote: String(form.get("conditionNote") ?? ""), dailyRatePaise: paise(form.get("rate")), approximateValuePaise: paise(form.get("value")), depositPaise: paise(form.get("deposit")), areaLabel, availableFrom, availableUntil, ...(draft ? { expectedVersion: version } : {}) };
       const response = await fetch(`/api/v1/me/listings${draft ? `/${draft.id}` : ""}`, { method: draft ? "PATCH" : "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
       const result = await response.json();
-      if (!response.ok) { if (response.status === 409) setConflict(true); throw new Error(result.error?.message ?? "Your draft could not be saved. Please try again."); }
+      if (!response.ok) { if (response.status === 409 && result.error?.code !== "DUPLICATE_DRAFT") setConflict(true); throw new Error(result.error?.message ?? "Your draft could not be saved. Please try again."); }
       router.replace("/listings?saved=1"); router.refresh();
     } catch (error) { setMessage(error instanceof Error ? error.message : "We couldn’t save this draft. Your changes are still in the form."); }
     finally { setBusy(false); }
@@ -73,7 +80,8 @@ export function DraftForm({ draft, photosEnabled = false }: { draft?: DraftListi
         <Input id="value" name="value" label="Approximate current value (INR, optional)" type="number" min="0" step="0.01" defaultValue={rupees(draft?.approximateValuePaise)} hint="Your estimate of the item’s value. This does not automatically set the deposit."/>
         <Input id="areaLabel" name="areaLabel" label="Approximate pickup area" required maxLength={120} defaultValue={draft?.areaLabel} placeholder="For example, Patamata" hint="Required · A neighbourhood is enough. Don’t enter your exact home address."/>
         {draft && <DraftPhotos draft={draft} version={version} enabled={photosEnabled} disabled={busy || conflict} onBusy={setPhotoBusy} onVersion={setVersion} onConflict={() => setConflict(true)}/>}
-        <p className="journey-note">{draft ? "Photo changes save as you upload. Save the details above to finish and return to My Listings." : "Save to return to My Listings, then choose Edit draft to add photos."} Your item stays private. Availability comes later.</p>
+        <ListingAvailability from={availableFrom} until={availableUntil} onChange={(from, until) => { setAvailableFrom(from); setAvailableUntil(until); }}/>
+        <p className="journey-note">{draft ? "Photo changes save as you upload. Save the details above to finish and return to My Listings." : "Save to return to My Listings, then choose Edit draft to add photos."} Your item stays private. Availability dates do not reserve the item.</p>
       </section>
       <div className="draft-actions journey-actions">{step > 0 ? <Button type="button" variant="secondary" onClick={() => changeStep(step - 1)}>← Back</Button> : <Link className="text-link" href="/listings">Back to My Listings</Link>}{step < 2 ? <Button key="continue" type="button" disabled={step === 0 && !category} onClick={event => { event.preventDefault(); next(); }}>Continue →</Button> : <Button key="save" type="submit" name="draftAction" value="save">{busy ? "Saving…" : "Save private draft"}</Button>}</div>
     </fieldset>{message && <p role="status" className="auth-feedback">{message}</p>}{conflict && <Button type="button" variant="secondary" onClick={() => window.location.reload()}>Discard unsaved changes and load latest draft</Button>}</form>

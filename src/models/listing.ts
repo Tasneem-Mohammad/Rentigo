@@ -19,6 +19,8 @@ const schema = new Schema({
   approximateValuePaise: { type: Number, default: null, min: 0 },
   depositPaise: { type: Number, default: null, min: 0 },
   areaLabel: { type: String, required: true, maxlength: 120 },
+  availableFrom: { type: String, default: null },
+  availableUntil: { type: String, default: null },
   photos: { type: [photoSchema], default: [] },
   status: { type: String, enum: ["draft"], default: "draft", required: true },
   currency: { type: String, enum: ["INR"], default: "INR", immutable: true },

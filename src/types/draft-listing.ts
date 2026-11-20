@@ -10,6 +10,8 @@ export interface DraftListing {
   approximateValuePaise: number | null;
   depositPaise: number | null;
   areaLabel: string;
+  availableFrom: string | null;
+  availableUntil: string | null;
   status: "draft";
   version: number;
   updatedAt: string;

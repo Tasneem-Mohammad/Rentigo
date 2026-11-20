@@ -16,7 +16,7 @@ function load(relative) {
   if (!fs.existsSync(file)) file = file.replace(/\.tsx?$/, "") + (fs.existsSync(file.replace(/\.tsx?$/, "") + ".tsx") ? ".tsx" : ".ts");
   const output = ts.transpileModule(fs.readFileSync(file, "utf8"), { fileName: file, compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, jsx: ts.JsxEmit.ReactJSX, esModuleInterop: true } }).outputText;
   const compiled = { exports: {} };
-  const dependency = name => name === "react" ? hooks : name === "server-only" ? {} : name === "next/navigation" ? { useRouter: () => router }
+  const dependency = name => name.endsWith(".css") ? {} : name === "react" ? hooks : name === "server-only" ? {} : name === "next/navigation" ? { useRouter: () => router }
     : name.startsWith("@/") ? load(name.slice(2) + ".ts") : name.startsWith(".") ? load(path.relative(root, path.resolve(path.dirname(file), name + ".ts"))) : require(name);
   new Function("require", "module", "exports", output)(dependency, compiled, compiled.exports);
   return compiled.exports;
@@ -36,7 +36,8 @@ globalThis.requestAnimationFrame = callback => { callback(); return 0; };
 globalThis.HTMLButtonElement = class { constructor(name, value) { this.name = name; this.value = value; } };
 globalThis.FormData = class { constructor(form) { this.values = form.values; } get(key) { return this.values[key] ?? null; } };
 let status = 200;
-globalThis.fetch = async (url, options) => { requests.push({ url, ...options }); return { ok: status < 400, status, json: async () => status < 400 ? { data: { id: "test-id", version: 10 } } : { error: { message: "Reload the latest draft." } } }; };
+let errorCode = "VERSION_CONFLICT";
+globalThis.fetch = async (url, options) => { requests.push({ url, ...options }); return { ok: status < 400, status, json: async () => status < 400 ? { data: { id: "test-id", version: 10 } } : { error: { message: "Reload the latest draft.", code: errorCode } } }; };
 const draft = { ...fields, id: "1234567890abcdef12345678", version: 2, photos: [], pendingPhotoIds: [] };
 const values = { title: fields.title, areaLabel: "  Patamata  ", rate: "25.50", deposit: "0", value: "2000" };
 const props = { draft, photosEnabled: true };
@@ -79,3 +80,44 @@ state = []; destinations.length = 0; status = 409;
 tree = render(); next(tree); await save(render());
 assert.deepEqual(destinations, []); assert.equal(named(render(), "DraftPhotos").props.disabled, true);
 console.log("PASS: required/trimmed pickup area on create/update/model, photos before final Save, no Continue/accidental-submit writes, upload/save coordination and shared version, zero deposit, create/edit return to My Listings, and conflict retention. UI/persistence mocked; live acceptance remains manual.");
+
+const dates = load("lib/listing-availability.ts");
+for (const [from, until] of [["2026-12-10",null],[null,"2026-12-10"],["2026-12-11","2026-12-10"],["2026-02-30","2026-03-01"]]) {
+ assert.ok(dates.availabilityError(from,until));
+ assert.equal(draftFields.safeParse({...fields,availableFrom:from,availableUntil:until}).success,false);
+ assert.equal(draftUpdate.safeParse({...fields,expectedVersion:0,availableFrom:from,availableUntil:until}).success,false);
+}
+assert.equal(dates.availabilityError("2028-02-29","2028-02-29"),"");
+assert.equal(dates.availabilityError(null,null),"");
+assert.equal(draftFields.parse(fields).availableFrom,null);
+assert.equal(draftFields.parse({...fields,availableFrom:"2026-12-01",availableUntil:"2026-12-10"}).availableUntil,"2026-12-10");
+state=[];requests.length=0;destinations.length=0;status=200;
+tree=render();next(tree);tree=render();
+let availability=named(tree,"ListingAvailability");
+availability.props.onChange("2026-12-10","2026-12-01");
+await save(render());assert.equal(requests.length,0,"Invalid dates cannot be saved");
+named(render(),"ListingAvailability").props.onChange("2026-12-01","2026-12-10");
+await save(render());assert.equal(JSON.parse(requests.at(-1).body).availableFrom,"2026-12-01");
+assert.equal(JSON.parse(requests.at(-1).body).availableUntil,"2026-12-10");
+named(render(),"ListingAvailability").props.onChange(null,null);
+await save(render());assert.equal(JSON.parse(requests.at(-1).body).availableFrom,null);
+console.log("PASS: availability real-date validation, paired/ordered dates, same-day/leap-day, legacy defaults, client save guard, persisted payload and clear-to-null.");
+
+state=[];destinations.length=0;status=409;errorCode="DUPLICATE_DRAFT";
+tree=render();next(tree);await save(render());
+assert.equal(named(render(),"DraftPhotos").props.disabled,false,"Duplicate correction must remain editable");
+assert.deepEqual(destinations,[]);
+const {DeleteDraft}=load("components/listings/delete-draft.tsx");
+function deletion(){index=0;return DeleteDraft({id:draft.id,title:draft.title,version:draft.version});}
+state=[];requests.length=0;destinations.length=0;status=200;
+let control=deletion();
+assert.ok(nodes(control).find(node=>node.type==="button").props["aria-label"].includes(draft.title));
+nodes(control).find(node=>node.type==="button").props.onClick();
+control=deletion();assert.equal(requests.length,0,"Opening confirmation cannot delete");
+nodes(control).find(node=>node.props.children==="Cancel").props.onClick();
+assert.equal(requests.length,0);
+control=deletion();nodes(control).find(node=>node.type==="button").props.onClick();
+control=deletion();await nodes(control).find(node=>node.props.children==="Delete draft").props.onClick();
+assert.equal(requests.at(-1).method,"DELETE");assert.equal(JSON.parse(requests.at(-1).body).expectedVersion,2);
+assert.deepEqual(destinations,["/listings?deleted=1"]);
+console.log("PASS: duplicate correction stays editable; delete icon is labelled, confirmation/cancel do not write, confirmed deletion sends version and returns to My Listings.");

@@ -295,6 +295,12 @@ svg { flex-shrink:0; }
 @media(max-width:380px) { .category-picker { grid-template-columns:1fr; }.category-choice { flex-direction:row; align-items:center; }.category-art { width:80px; min-height:85px; flex-shrink:0; }.category-choice-copy { padding-right:15px; }.choice-indicator { top:17px; right:17px; } }
 /* Keep user-provided profile values within the card at narrow widths. */
 .profile-card h2 { overflow-wrap:anywhere; }
+.draft-row-actions { display:grid; gap:12px; flex:0 0 auto; max-width:350px; }
+.delete-draft-trigger { display:inline-flex; align-items:center; gap:8px; min-height:44px; padding:8px 12px; color:var(--accent); border:1px solid var(--line); background:transparent; border-radius:3px; cursor:pointer; }
+.delete-draft p { font-size:13px; overflow-wrap:anywhere; margin:8px 0; }
+.delete-draft .draft-actions { gap:10px; padding-top:4px; }
+.delete-draft .button { font-size:13px; padding:10px 14px; }
+@media(max-width:640px) { .draft-row-actions { width:100%; max-width:none; } }
 .profile-details .definition-row { align-items:flex-start; }
 .profile-details dt { flex:0 0 42%; min-width:0; overflow-wrap:anywhere; }
 .profile-details dd { flex:1 1 0; min-width:0; overflow-wrap:anywhere; }
