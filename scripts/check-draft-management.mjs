@@ -110,6 +110,7 @@ staged.depositPaise = 0;
 const zeroDeposit = await publish.POST(publishRequest(staged.version), publishContext);
 assert.equal(zeroDeposit.status, 400); assert.equal((await zeroDeposit.json()).error.code, "ZERO_DEPOSIT_NOT_APPROVED"); assert.equal(staged.status, "draft");
 staged.depositPaise = 100;
+staged.availableFrom = null; staged.availableUntil = null; // Usually available is publishable.
 const published = await publish.POST(publishRequest(staged.version), publishContext);
 assert.equal(published.status, 200);
 assert.match(published.headers.get("cache-control"), /no-store/);

@@ -151,3 +151,15 @@ assert.equal(requests[0].method,"PATCH");
 assert.equal(requests[1].method,"POST");
 assert.deepEqual(destinations,["/?published=test-id"],"A successful publish returns home with publication confirmation");
 console.log("PASS: successful publish returns home with the saved listing confirmation.");
+
+state=[];requests.length=0;destinations.length=0;status=200;
+tree=render();next(tree);
+assert.equal(named(render(),"ListingAvailability").props.specificDates,false,"No dates defaults to Usually available");
+named(render(),"ListingAvailability").props.onSpecificDates(true);
+await save(render(),values,new HTMLButtonElement("draftAction","publish"));
+assert.equal(requests.length,0,"Specific-date mode needs both dates before publication");
+named(render(),"ListingAvailability").props.onSpecificDates(false);
+named(render(),"ListingAvailability").props.onChange(null,null);
+await save(render(),values,new HTMLButtonElement("draftAction","publish"));
+assert.equal(requests.length,2,"Usually available can save and publish without dates");
+console.log("PASS: usual availability default, optional specific window validation and date-free publication journey.");

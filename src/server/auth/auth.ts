@@ -1,6 +1,6 @@
 import "server-only";
 import { betterAuth } from "better-auth";
-import { APIError } from "better-auth/api";
+import { APIError, createAuthMiddleware } from "better-auth/api";
 import { mongodbAdapter } from "better-auth/adapters/mongodb";
 import { username } from "better-auth/plugins";
 import { MongoClient } from "mongodb";
@@ -37,6 +37,13 @@ function createAuth() {
   return betterAuth({
     appName: "Rentigo", basePath: "/api/auth", baseURL: env.BETTER_AUTH_URL, secret: env.BETTER_AUTH_SECRET,
     trustedOrigins: [new URL(env.BETTER_AUTH_URL).origin],
+    hooks: { before: createAuthMiddleware(async ctx => {
+      if (ctx.path !== "/sign-up/email" || typeof ctx.body?.email !== "string") return;
+      const email = ctx.body.email.trim().toLowerCase();
+      if (!email || email.length > 254) return;
+      const existing = await ctx.context.internalAdapter.findUserByEmail(email);
+      if (existing?.user) throw new APIError("CONFLICT", { code: "USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL", message: "An account with this email already exists. Sign in or reset your password." });
+    }) },
     database: mongodbAdapter(database, { client }),
     emailAndPassword: { enabled: true, autoSignIn: false, requireEmailVerification: env.verificationRequired, minPasswordLength: 12, maxPasswordLength: 128, revokeSessionsOnPasswordReset: true, sendResetPassword: env.emailAvailable ? async ({ user, url }) => sendEmail(user.email, url, "reset") : undefined },
     emailVerification: { sendOnSignUp: env.verificationRequired, sendOnSignIn: env.verificationRequired, autoSignInAfterVerification: false, expiresIn: 3600, sendVerificationEmail: env.emailAvailable ? async ({ user, url }) => sendEmail(user.email, url, "verify") : undefined },

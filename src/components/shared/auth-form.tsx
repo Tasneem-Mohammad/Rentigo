@@ -50,10 +50,13 @@ export function AuthForm({ mode, enabled, google, token, verificationRequired = 
       }
       if (mode === "forgot") { setMessage("If this address can receive a password-reset email, a link will be sent. Check your inbox."); return; }
       if (mode === "signup") {
+        const data = await response.json().catch(() => null);
+        const code = data?.code ?? data?.error?.code;
         if (response.status === 409) {
-          const data = await response.json().catch(() => null);
           if (data?.error?.code === "ALREADY_SIGNED_IN") { router.replace("/dashboard"); router.refresh(); return; }
         }
+        if (!response.ok && code === "USERNAME_IS_ALREADY_TAKEN") { setMessage("That username is already taken. Please choose another username."); return; }
+        if (!response.ok && ["USER_ALREADY_EXISTS", "USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL"].includes(code)) { setMessage("An account with this email already exists. Sign in or use Forgot password to recover it."); return; }
         if (!response.ok) { setMessage("Registration failed. Check your details, including your username, or sign in if you already have an account."); return; }
         setVerificationEmail(email); form.reset(); setSignupSubmitted(true);
         return;

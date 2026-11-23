@@ -61,8 +61,10 @@ const signup = await post("sign-up/email", { name: "Verification test", username
 assert.equal(signup.status, 200);
 const id = (await signup.json()).user.id;
 const duplicate = await post("sign-up/email", { name: "Different name", username: "different_user", email: email.toUpperCase(), password: "different-password-1234", callbackURL });
-assert.equal(duplicate.status, 200, "Duplicate email remains enumeration-safe");
-assert.equal(store.user.length, 1, "Duplicate/case-variant email never creates a second stored account");
+assert.equal(duplicate.status, 409, "Duplicate email has explicit signup guidance");
+const duplicateUsername = await post("sign-up/email", { name: "Different name", username: "VERIFY_TEST", email: "other@example.test", password, callbackURL });
+assert.equal(duplicateUsername.status, 400); assert.equal((await duplicateUsername.json()).code, "USERNAME_IS_ALREADY_TAKEN");
+assert.equal(store.user.length, 1, "Duplicate/case-variant email or username never creates a second stored account");
 assert.equal(store.user[0].id, id);
 assert.equal(store.user[0].username, "verify_test");
 assert.equal(store.account.length, 1, "Duplicate signup does not add or replace credentials");

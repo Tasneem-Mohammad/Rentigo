@@ -20,7 +20,6 @@ export async function publishListing(id: string, input: unknown) {
   if (!draftFields.safeParse(fields).success) missing.push("valid item details and pickup area");
   if (!draft.photos.length || draft.pendingPhotoIds.length) missing.push("at least one completed photo and no unfinished uploads");
   if (draft.dailyRatePaise === null || draft.depositPaise === null || draft.approximateValuePaise === null) missing.push("rental price, deposit and estimated value");
-  if (!draft.availableFrom || !draft.availableUntil) missing.push("availability dates");
   if (missing.length) throw new DraftError(400, "LISTING_INCOMPLETE", `Your changes are saved privately. Add ${missing.join("; ")} before publishing.`);
   if (draft.depositPaise === 0) throw new DraftError(400, "ZERO_DEPOSIT_NOT_APPROVED", "Your changes are saved privately. Publishing with a zero deposit is not enabled until the deposit policy is approved.");
   const session = await currentSession();

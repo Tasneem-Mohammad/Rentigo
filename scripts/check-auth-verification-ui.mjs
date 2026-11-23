@@ -125,3 +125,12 @@ for (const [value, label] of [["verified", "Email verified"], ["unverified", "Em
   assert.ok(html.includes(label)); assert.ok(html.includes("<svg")); assert.ok(html.includes('aria-hidden="true"'));
 }
 console.log("PASS: signup verification step and prefilled resend, neutral pending badge, failed-signup retention, verified/unverified icons, sign-in verification guidance and wrong-password/username privacy. Component hooks, fetch and form data mocked; browser acceptance pending.");
+
+for (const [code, text] of [["USERNAME_IS_ALREADY_TAKEN", "username is already taken"], ["USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL", "email already exists"]]) {
+ state=[]; tree=render(); const before=resets;
+ await submit(tree,registration,code.startsWith('USERNAME')?400:409,{code});
+ assert.ok(elements(render()).some(node=>node.props.role==='status'&&String(node.props.children).includes(text)));
+ assert.ok(elements(render()).some(node=>node.type==='form'));
+ assert.equal(resets,before,'Duplicate errors must retain entered details');
+}
+console.log('PASS: specific duplicate username/email guidance retains the signup form and entered details.');

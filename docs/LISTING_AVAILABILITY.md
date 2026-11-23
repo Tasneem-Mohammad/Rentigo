@@ -22,3 +22,7 @@ The draft-journey regression covers invalid/leap dates, partial/reversed ranges,
 Implementation checks passed: the draft-journey and photo regressions, lint, TypeScript, `git diff --check`, and the Webpack production build. No live database writes or browser acceptance test were performed for this increment. Project status records implementation separately from acceptance.
 
 Restart the development server before testing, because Mongoose caches the listing schema in a running process. Open an existing draft, continue to step 3, set both dates, save and reopen. Check retained dates, Clear dates plus save/reopen, a reversed/partial range, mobile date inputs, unchanged photos/pickup/prices, and a competing-tab stale save. Do not mark the milestone accepted until this live review passes.
+
+## Current availability choice — 23 November 2026
+
+User-approved simplification: Usually available is the default. Only on specific dates exposes the existing paired date controls. Both stored dates null means usually available; existing windows stay intact. Publication accepts usual availability and still validates any provided window. A specific-date selection without dates is blocked on publish; drafts may omit dates and will reopen as Usually available until a window is saved. Renters will select their own rental dates later, subject to owner approval. No booking or reservation logic is added.

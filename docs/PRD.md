@@ -262,3 +262,7 @@ This exception does not mark an account identity-verified or eligible for rental
 ### Hosting revision — confirmed 20 November 2026
 
 The user selected Vercel for hosted testing instead of the earlier Netlify proposal in section 15. Start with the interface deployment, then configure the assigned HTTPS origin and separate testing services before enabling accounts. This does not approve public rental launch or extend the local-only publishing exception. See [Vercel setup](VERCEL_SETUP.md).
+
+### Availability simplification — confirmed 23 November 2026
+
+Owner listings default to Usually available, with an optional Only on specific dates window. A complete window remains validated when supplied; both dates omitted means usually available, not incomplete publication. Existing saved windows remain unchanged. Renters choose their rental dates later and owner approval remains required; this is not a reservation guarantee.

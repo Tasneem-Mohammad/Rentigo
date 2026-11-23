@@ -45,6 +45,7 @@ export function DraftForm({ draft: initialDraft, photosEnabled = false }: { draf
   const [condition, setCondition] = useState(draft?.condition ?? "");
   const [availableFrom, setAvailableFrom] = useState(draft?.availableFrom ?? null);
   const [availableUntil, setAvailableUntil] = useState(draft?.availableUntil ?? null);
+  const [specificDates, setSpecificDates] = useState(!!(draft?.availableFrom || draft?.availableUntil));
   async function save(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault(); if (busy || photoBusy || conflict) return; if (step < 2) { next(); return; }
     const submitter = (event.nativeEvent as SubmitEvent).submitter;
@@ -52,6 +53,7 @@ export function DraftForm({ draft: initialDraft, photosEnabled = false }: { draf
     const form = new FormData(event.currentTarget);
     const areaLabel = String(form.get("areaLabel") ?? "").trim();
     if (!areaLabel) { setMessage("Enter an approximate pickup area before saving your draft."); event.currentTarget.querySelector<HTMLInputElement>("#areaLabel")?.focus(); return; }
+    if (submitter.value === "publish" && specificDates && (!availableFrom || !availableUntil)) { setMessage("Choose both availability dates or select Usually available before publishing."); return; }
     const dateError = availabilityError(availableFrom, availableUntil);
     if (dateError) { setMessage(dateError); return; }
     setMessage(""); setBusy(true);
@@ -89,9 +91,10 @@ export function DraftForm({ draft: initialDraft, photosEnabled = false }: { draf
         <div className="draft-field-grid"><Input id="rate" name="rate" label="Daily rental price (INR, optional)" type="number" min="0" step="0.01" defaultValue={rupees(draft?.dailyRatePaise)}/><Input id="deposit" name="deposit" label="Refundable deposit (INR, optional)" type="number" min="0" step="0.01" defaultValue={rupees(draft?.depositPaise)} hint="An amount you choose, separate from rental earnings."/></div>
         <Input id="value" name="value" label="Approximate current value (INR, optional)" type="number" min="0" step="0.01" defaultValue={rupees(draft?.approximateValuePaise)} hint="Your estimate of the item’s value. This does not automatically set the deposit."/>
         <Input id="areaLabel" name="areaLabel" label="Approximate pickup area" required maxLength={120} defaultValue={draft?.areaLabel} placeholder="For example, Patamata" hint="Required · A neighbourhood is enough. Don’t enter your exact home address."/>
-        {!draft && <Button type="submit" disabled={conflict} name="draftAction" value="photos" variant="secondary">Add photos</Button>}
+        {!draft && <Button type="submit" disabled={conflict} name="draftAction" value="photos" variant="secondary" aria-busy={busy}>{busy ? "Please wait…" : "Add photos"}</Button>}
+        {!draft && busy && <p role="status" className="journey-note">Saving your item details. Please wait…</p>}
         {draft && <DraftPhotos draft={draft} version={version} enabled={photosEnabled} disabled={busy || conflict} onBusy={setPhotoBusy} onVersion={setVersion} onConflict={() => setConflict(true)}/>}
-        <ListingAvailability from={availableFrom} until={availableUntil} onChange={(from, until) => { setAvailableFrom(from); setAvailableUntil(until); }}/>
+        <ListingAvailability specificDates={specificDates} onSpecificDates={setSpecificDates} from={availableFrom} until={availableUntil} onChange={(from, until) => { setAvailableFrom(from); setAvailableUntil(until); }}/>
         <p className="journey-note">{draft ? "Photo changes save as you upload. Save the details above to finish and return to My Listings." : "Choose Add photos to prepare private photo storage without leaving this form."} Your listing stays private until publishing checks pass. Availability dates do not reserve the item.</p>
       </section>
       <div className="draft-actions journey-actions">{step > 0 ? <Button type="button" variant="secondary" onClick={() => changeStep(step - 1)}>← Back</Button> : <Link className="text-link" href="/listings">Back to My Listings</Link>}{step < 2 ? <Button key="continue" type="button" disabled={step === 0 && !category} onClick={event => { event.preventDefault(); next(); }}>Continue →</Button> : <div className="draft-actions"><Button key="save" type="submit" variant="secondary" disabled={conflict} name="draftAction" value="save">Save as draft</Button><Button type="submit" disabled={conflict} name="draftAction" value="publish">{busy ? "Saving…" : "Publish listing"}</Button></div>}</div>
