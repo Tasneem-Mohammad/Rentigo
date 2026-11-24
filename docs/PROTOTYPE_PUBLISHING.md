@@ -30,3 +30,15 @@ Automated checks exercise isolated transactional persistence and UI doubles. Liv
 A running Next development server can retain Mongoose's earlier draft-only model after a code reload. Publication then rejects the new status/field and previously surfaced as the generic draft-access error. Development model initialization now replaces only a cached model missing publication support; compatible models are reused. This changes the in-memory model, not saved records. A database-free regression reproduces the old-schema rejection and validates the refreshed model (scripts/check-listing-model-reload.mjs). Restart the development server after pulling schema changes.
 
 Publishing rejects an explicit zero deposit until its policy is approved; zero remains valid in private drafts. Explore accepts free-text pickup areas with case-insensitive substring matching. After a conflicting save, step navigation and local text remain available for copying; save/publish/photo mutations stay blocked until an explicit reload discards local changes.
+
+## Hosted prototype simplification - confirmed 24 November 2026
+
+The user removed the pending tester-only implementation before deployment. Its profile switches, private API, testing-record repository, allowlist and extra mode variable are removed. No live account or database records were changed or deleted.
+
+This supersedes historical local-only restrictions above. Set ENABLE_PROTOTYPE_PUBLISHING=true on the testing website and redeploy after this code is deployed. BETTER_AUTH_URL must be the exact HTTPS origin. HTTP localhost is supported only in development. Missing/false flags, malformed URLs and hosted HTTP fail closed. Do not set NODE_ENV to development on Vercel.
+
+Flow: signup, verify email, complete listing/photos, publish. Active account, verified email, ownership, valid complete listing details, finished photos, positive deposit, version checking and same-origin JSON remain enforced. Usually available does not require dates; any supplied date window must be valid and complete.
+
+Real identityStatus and eligibilityStatus remain unchanged; canPublish and canBook remain false for real transactions. canPublishPrototype reflects the environment switch and verified email. Prototype listings remain labelled. No real rental requests or payments are enabled. Withdrawal works with the flag off; disabling it also hides prototype discovery and photos.
+
+No per-account setup is needed. Remove obsolete RENTIGO_MODE and PROTOTYPE_TESTER_EMAILS variables if added; they are no longer read. Genuine identity/eligibility verification remains required before real rental launch. Older large Cloudinary assets still require hosted proxy payload acceptance.

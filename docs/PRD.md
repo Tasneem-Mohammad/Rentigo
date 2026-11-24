@@ -266,3 +266,7 @@ The user selected Vercel for hosted testing instead of the earlier Netlify propo
 ### Availability simplification — confirmed 23 November 2026
 
 Owner listings default to Usually available, with an optional Only on specific dates window. A complete window remains validated when supplied; both dates omitted means usually available, not incomplete publication. Existing saved windows remain unchanged. Renters choose their rental dates later and owner approval remains required; this is not a reservation guarantee.
+
+### Hosted prototype publishing - confirmed 24 November 2026
+
+The user approved one server-controlled publishing switch for the hosted testing site. No tester allowlist or simulated identity/eligibility toggles are required. Active owners must verify email and complete current listing/photo/deposit checks before publication. Actual identity and transaction-eligibility fields remain unchanged. Genuine verification is deferred until before real rental launch; real bookings/payments remain unavailable. This supersedes local-only publishing restrictions for prototype testing.

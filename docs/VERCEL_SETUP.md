@@ -25,3 +25,7 @@ Set BETTER_AUTH_URL to the exact chosen HTTPS deployment origin, without a trail
 Then deliberately enable and test database/auth/photo services. Imported secrets alone do not complete hosted configuration. Hosted publishing remains blocked by design; a separate approved hosted-prototype gate is required. Before enabling photo delivery, reconcile the current 5 MiB private proxy limit with Vercel's 4.5 MB function payload limit, including existing assets. No existing photos are removed by this setup.
 
 Test signup/verification/login, recovery, protected pages, ownership isolation and uploads before sharing with testers. Use deployment protection where available. Continue local work on feature branches, test previews, then merge approved changes to main.
+
+## Hosted publishing update - 24 November 2026
+
+After this code is deployed, set ENABLE_PROTOTYPE_PUBLISHING=true for the HTTPS testing website and redeploy. No tester allowlist, profile switches or extra mode variable is needed. Keep existing hosted database/auth/Cloudinary/email settings and exact HTTPS BETTER_AUTH_URL. This supersedes earlier statements that all hosted publishing is blocked. Real verification and rental launch remain separate work. See PROTOTYPE_PUBLISHING.md.

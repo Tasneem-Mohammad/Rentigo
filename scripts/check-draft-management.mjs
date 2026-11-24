@@ -97,7 +97,7 @@ console.log("PASS: incomplete and unverified listings cannot publish and remain 
 emailVerified=true;
 const identityGate=await publish.POST(publishRequest(staged.version),publishContext);
 assert.equal(identityGate.status,403);assert.equal((await identityGate.json()).error.code,"PUBLISHING_NOT_READY");assert.equal(staged.status,"draft");
-console.log("PASS: even complete/email-verified accounts cannot bypass the unimplemented identity/eligibility rollout gate.");
+console.log("PASS: complete/email-verified accounts remain private while prototype publishing is disabled.");
 
 prototypeEnabled = true;
 actor = "other";
@@ -154,8 +154,10 @@ try {
   process.env.ENABLE_PROTOTYPE_PUBLISHING = "true"; process.env.BETTER_AUTH_URL = "http://localhost:3000";
   process.env.NODE_ENV = "production"; assert.equal(guard(), false);
   process.env.NODE_ENV = "development"; assert.equal(guard(), true);
-  process.env.BETTER_AUTH_URL = "https://rentigo.example"; assert.equal(guard(), false);
+  process.env.BETTER_AUTH_URL = "https://rentigo.example"; assert.equal(guard(), true);
+  process.env.NODE_ENV = "production"; assert.equal(guard(), true);
+  process.env.BETTER_AUTH_URL = "http://rentigo.example"; assert.equal(guard(), false);
   process.env.BETTER_AUTH_URL = "not a URL"; assert.equal(guard(), false);
   process.env.BETTER_AUTH_URL = "http://localhost:3000"; process.env.ENABLE_PROTOTYPE_PUBLISHING = "false"; assert.equal(guard(), false);
 } finally { for (const [key, value] of Object.entries(previous)) { if (value === undefined) delete process.env[key]; else process.env[key] = value; } }
-console.log("PASS: real feature guard fails closed in production, non-local/malformed URLs and without explicit opt-in.");
+console.log("PASS: real feature guard allows explicit HTTPS hosted testing and rejects non-local HTTP, malformed URLs and disabled flags.");

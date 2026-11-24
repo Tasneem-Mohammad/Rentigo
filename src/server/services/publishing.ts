@@ -24,7 +24,7 @@ export async function publishListing(id: string, input: unknown) {
   if (draft.depositPaise === 0) throw new DraftError(400, "ZERO_DEPOSIT_NOT_APPROVED", "Your changes are saved privately. Publishing with a zero deposit is not enabled until the deposit policy is approved.");
   const session = await currentSession();
   if (!session?.user.emailVerified) throw new DraftError(403, "EMAIL_NOT_VERIFIED", "Your changes are saved privately. Verify your email before publishing.");
-  if (!prototypePublishingEnabled()) throw new DraftError(403, "PUBLISHING_NOT_READY", "Your details are saved privately. Prototype publishing is available only in explicitly enabled local development. Identity and eligibility checks remain required before public launch.");
+  if (!prototypePublishingEnabled()) throw new DraftError(403, "PUBLISHING_NOT_READY", "Your details are saved privately. Prototype publishing is disabled for this environment. Identity and eligibility verification remain required before public launch.");
   if (session.user.accountStatus !== "active") throw new DraftError(403, "ACCOUNT_RESTRICTED", "Your account cannot publish listings.");
   try {
     const result = await repository.publishPrototype(session.user.id, id, version);
